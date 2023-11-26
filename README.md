@@ -152,11 +152,99 @@ function HookCounterThree() {
   )
 }
 
-State hook summary:
+useState hook summary:
 1. The useState hook lets you add state to functional components
 2. in classes, the state is always an object while the useState hook, the state doesn't have to be an object. 
 3. The useState hook returns an array with 2 elements, the first being the current value of the state,and the  second element is a state setter function.
 4. New state value depends ont he previous state value? you can pass a function to the setter function.
 5. When dealing with objects or arrays, alwaays make sure to spread your state variable and then call the setter function.
+
+
+UseEffect Hook:
+During development say when updating the header with the current counter value or calling APIs, with class components we use the life cycle methods like componentDidMount and ComponentDidUpdate. We will have the initialization done once using the componentDidMount and to update the value we use the componentDidMount method to have it incremented.
+To update the title, we write the code twice, i.e., initialize on componentDidMount and update upsing the componentDidUpdate. 
+For a timer, the code will also be added to the componentDidMount and componentWillUnmount to initialize the time and destroy it respectively.
+
+Code for timer and updating the DOM which are completely unrelated are put together. But it would be nice to only group related code and also not to repeat code. This is what the effectHook helps us to achieve.
+Therefore, three life cycle methods can be handled by the useEffect hook:
+1. componentDidMount
+2. componentDidUpdate
+3. componentWillUnmount
+
+The effect Hook lets you perfom side effects in functional components.
+
+The useEffect is a function that gets executed after every render of the component. It runs after the first render and every other render/update.
+It is accessed within the component and with this we can access its props without having to write any extra code.
+
+With the class counter, whenever you change a value, the componentDidMount is called and keep and thus calling unnecessary code. Consider:
+class ClassCounterOne extends Component {
+    constructor(props) {
+      super(props)
+    
+      this.state = {
+         count: 0,
+         name: '',
+      }
+    }
+
+    componentDidMount() {
+        document.title = `Clicked ${this.state.count} times`
+    }
+
+    componentDidUpdate = (prevProps, prevState) => {
+      console.log('Updatingdocumet Title!')
+        document.title = `Clicked ${this.state.count} times`
+    }
+    
+  render() {
+    return (
+      <div>
+        <input type='text' value={this.state.value} onChange={e => {
+          this.setState({
+            name: e.target.value
+          })
+        }}/>
+        <button onClick={() => this.setState({ count: this.state.count + 1})}> Clicked {this.state.count} times </button>
+      </div>
+    )
+  }
+}
+
+Changing the componetDidUpdate code to this:
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevState.count !== this.state.count) {
+      console.log('Updatingdocumet Title!')
+      document.title = `Clicked ${this.state.count} times` 
+    }
+  }
+
+will conditionally update the title when the count changes.
+
+When the name is changed, console.log('Updatingdocumet Title!') gets logged every time which is unnecessary. On a class component you can use the prevProps and prevState parameters to control whether the update will be made or not.
+
+The same can be achieved using the useEffect hook:
+function HookCounterOne() {
+    const [count, setCount] = useState(0)
+    const [name, setName] = useState('')
+
+    useEffect(() => {
+        console.log('Updated the title!')
+        document.title = `You clicked ${count} times`
+    })
+
+  return (
+    <div>
+        <input type='text' value={name} onChange={e => setName(e.target.value)}/>
+        <button onClick={() => setCount(count + 1)}>Clicked {count} times</button>
+    </div>
+  )
+}
+
+by default, any change will execute the useEffect function. However, conditional effects can be achieved using the second parameter of the useEffects function that uses an array with props which can be checked and if they change the effect is then executed.
+
+
+
+
+
 
 
