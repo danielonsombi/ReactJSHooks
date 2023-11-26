@@ -321,6 +321,129 @@ function HookMouse() {
 
 With this the function and the 'useEffect called' will be called once.
 
+With useEffect, we can also Mimic the componentWillUnmount life cycle hook.
+If the event listener above had a toggle button to either show or hide it, even when hidden the event listener will still be listening to the mousemove. This should not be the case. If the component is hidden, all it is subscribers and listeners should be unmounted.
+
+In componentWillUnmount we could do this by removing the listener:
+ componentWillUnmount() {
+  window.removeEventListener('mousemove', this.logMousePosition)
+ }
+
+ we can mic this life cycle functionality in useEffect by using a return function in the useEffect method as:
+
+ useEffect(() => {
+  window.addEventListener('mousemove', logMousePosition)
+
+  return () => {
+    window.removeEventListener('mousemove', logMousePosition)
+  }
+ }, [])
+
+
+With use effect, one can at times run into incorrect dependencies. For instance, the useEffect can be used for both componentDidMount and componentDidUnmount. This can have a side effect on a timer functionality directly translated from a class component. Consider:
+
+
+class IntervalClassCounter extends Component {
+    constructor(props) {
+      super(props)
+    
+      this.state = {
+         count: 0
+      }
+    }
+
+    componentDidMount() {
+        this.interval = setInterval(this.tick, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval)
+    }
+
+    tick = () => {
+        this.setState({
+            count: this.state.count + 1
+        })
+    }
+    
+  render() {
+    return (
+      <div>
+        <h1>{this.state.count}</h1>
+      </div>
+    )
+  }
+}
+
+
+If directly translated using hooks then it becomes:
+
+function IntervalHookCounter() {
+    const [count, setCount] = useState(0)
+
+    const tick = () => {
+        setCount(count + 1)
+    }
+
+    useEffect(() => {
+        const interval = setInterval(tick, 1000)
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, []) 
+  return (
+    <div>
+      {count}
+    </div>
+  )
+}
+
+
+However the second will not watch for any changes for it will execute ones. The counter will therefore stop at 1 and not increment. We should therefore figure out a way to make react watch out for any changes. The count should/must therefore be added as a dependency that useEffect should watch out for. The correct useEffect function should therefore be:
+
+    useEffect(() => {
+        const interval = setInterval(tick, 1000)
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [count]) 
+
+    The same can also be achieved without using a dependency count. By use of the prevCount = prevCount+1 on the tick method.
+
+    const tick = () => {
+        setCount(prevCount = prevCount + 1)
+    }
+
+    useEffect(() => {
+        const interval = setInterval(tick, 1000)
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [])
+
+With this alway think through the problme before adding an empty dependency.
+sometime you may want to call a function from useEffect, it is always best practice to create the function within use effect. This will allow the function use the props without necessarily having to pass them from useEffect to a function created outside the useEffect method.
+
+    useEffect(() => {
+      function doSomething(){
+        console.log(someProp)
+      }
+      doSomething()
+
+      const interval = setInterval(tick, 1000)
+
+      return () => {
+          clearInterval(interval)
+      }
+    }, [someProp])
+
+Such an approach will help you remember of some props that must be considered/should be added as dependencies.
+
+You can have multiple useEffect methods within the same React function but it is not possible to have multiple life cycle methods of the same kind within the same class. This allows you to group together related code and not have separate functionalities within the same useEffect method. 
+
 
 
 
