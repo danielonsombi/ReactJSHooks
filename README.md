@@ -456,6 +456,56 @@ We can then use the useEffect method with axios library to pull data from an end
           })
   },[])
 
+  useContext:
+  On class component, there is need to nest several contexts to pass down a value from a parent down to its children. This make the code not easy to read e.g
+
+  import {UserContect, ChannelContext} from '../app'
+
+function ComponentF()
+{
+  return(
+    <div>
+      <UserContext.Consumer>
+        {
+          User => {
+            return (
+              <ChannelContext.Consumer>
+                {
+                  Channel => {
+                    <div>
+                      User context value {user}, channel context value {channel}
+                    </div>
+                  }
+                }
+              </ChannelContext.Consumer>
+            )
+          }
+        }
+      </UserContext.Consumer>
+    </div>
+  )
+}
+
+The context hook helps simplify this.
+To consume a context:
+1. import useContext from react
+2. import the necessary context
+3. call the useContext function passing in the contexts as its parameters then assign all the values to variable that can be called in the JSX
+
+The code is reduced significantly to:
+
+function ComponentE() {
+    const user = useContext(UserContext)
+    const channel = useContext(ChannelContext)
+  return (
+    <div>
+      {/* <ComponentF/> */}
+      User - {user} Channel - {channel}
+    </div>
+  )
+}
+
+
 
 
 
