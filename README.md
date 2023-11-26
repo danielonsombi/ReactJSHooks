@@ -444,6 +444,18 @@ Such an approach will help you remember of some props that must be considered/sh
 
 You can have multiple useEffect methods within the same React function but it is not possible to have multiple life cycle methods of the same kind within the same class. This allows you to group together related code and not have separate functionalities within the same useEffect method. 
 
+We can then use the useEffect method with axios library to pull data from an endpoint as:
+  useEffect(() => {
+      axios.get('https://jsonplaceholder.typicode.com/posts')
+          .then(res => {
+              console.log(res)
+              setPosts(res.data)
+          })
+          .catch(err => {
+              console.log(err)
+          })
+  },[])
+
 
 
 
