@@ -242,6 +242,85 @@ function HookCounterOne() {
 
 by default, any change will execute the useEffect function. However, conditional effects can be achieved using the second parameter of the useEffects function that uses an array with props which can be checked and if they change the effect is then executed.
 
+With componentDidMount, you can create an event once and it can be executed several times e.g
+class ClassMouse extends Component {
+    constructor(props) {
+      super(props)
+    
+      this.state = {
+         x:0,
+         y:0
+      }
+    }
+
+    logMousePosition = e => {
+        this.setState({
+            x: e.clientX,
+            y: e.clientY
+        })
+    }
+    
+    componentDidMount() {
+        window.addEventListener('mousemove', this.logMousePosition)
+    }
+  render() {
+    return (
+      <div>
+        X - {this.state.x} Y - {this.state.y}
+      </div>
+    )
+  }
+}
+
+the same can also be achieved using useEffects:
+function HookMouse() {
+    const [x, setX] = useState(0)
+    const [y, setY] = useState(0)
+
+    const logMousePosition = e => {
+        console.log('Mouse event')
+        setX(e.clientX)
+        setY(e.clientY)
+    }
+
+    useEffect(() => {
+        console.log('UseEffect called')
+        window.addEventListener('mousemove',logMousePosition)
+    })
+
+  return (
+    <div>
+      Hooks X - {x} Y - {y}
+    </div>
+  )
+}
+
+By default, the useEffect Called will be logged multiple times. to mimic the componentDidMount which is only called once, we pass an empty array to the useEffect method:
+
+function HookMouse() {
+    const [x, setX] = useState(0)
+    const [y, setY] = useState(0)
+
+    const logMousePosition = e => {
+        console.log('Mouse event')
+        setX(e.clientX)
+        setY(e.clientY)
+    }
+
+    useEffect(() => {
+        console.log('UseEffect called')
+        window.addEventListener('mousemove',logMousePosition)
+    }, [])
+
+  return (
+    <div>
+      Hooks X - {x} Y - {y}
+    </div>
+  )
+}
+
+With this the function and the 'useEffect called' will be called once.
+
 
 
 
