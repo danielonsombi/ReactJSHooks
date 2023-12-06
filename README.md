@@ -505,9 +505,54 @@ function ComponentE() {
   )
 }
 
+useReducers Hook:
+A useReducer is a hook used for state management. It is an alternative to useState.
+useState is built using useReducer.
+
+What is a reducer?
+Some of the reducers in vanilla javascript include, foreach, map and reduce.
+The reduce() method executes a reducer function on each element of the array, resulting in a single output value e.g.,
+
+const array1 = [1,2,3,4];
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+// 1 + 2 + 3 + 4
+console.log(array1.reduce(reducer));
+//expected output: 10
+
+//5 + 1 + 2 + 3 + 4
+console.log(array1.reduce(reducer, 5)); //gets the sum total of the first parameter and adds it to the second parameter.
+//expected output: 15
+
+There is a huge similarity between the reduce and useReducer method:
+
+Reduce in Javascript                                       useReducer in React
+array.reduce(reducer, initialValue)                   useReducer(reducer, initialState)
+singleValue = reducer(accumulater,itemValue)          newState = reducer(currentState, action)
+reduce method returns a single value                  useReducer returns a pair of values [newState, dispatch]
 
 
+UseReduce can be used with decimals and strings but also with objects. See CounterOne and CounterTwo implementations.
+Other than using state and action as objects to do multiple counters within the same functional component (Counter two), if working with local state manegement, you can instead use multiple useReducers to within the same component when not working with variables to be accessed globally.
 
+useReducer with useContext:
+useReducer - used in local state management.
+To share state between components (Global state amanegement) you can use the useReducer  + useContext.
+To use this, you need to create the reducer function on the app.js file then have the count as part of the JSX.
+The dispatch functionality will however be implemented in the nested component. This will make use of the context api.
+
+
+useState vs useReducer:
+Scenario                              useState                    useReducer
+Type of state                       Number, String,Boolean     Object or Array
+Number of State transitions         one or two                 Too Many (Best since can manage them centrally)
+Related state transitions?          No                         Yes 
+Business Logic                      No business logic          Complex business logic
+Local vs global                     Local                      Global
+
+
+useReducer makes it easier to reason through code since all the related code and transitions are kept together as opposed to the useState hook.
+useReducer makes it easier to use context with one dispatch state that can be used with global variables that should be accessed by other components in the tree.
 
 
 
