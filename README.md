@@ -554,6 +554,93 @@ Local vs global                     Local                      Global
 useReducer makes it easier to reason through code since all the related code and transitions are kept together as opposed to the useState hook.
 useReducer makes it easier to use context with one dispatch state that can be used with global variables that should be accessed by other components in the tree.
 
+UseCallback Hook.
+If one creates several components with one as the parent Component and the rested called within it, everytime a button on the components is clicked, all the components are re-rendered. Such is an indication that the code is not optimized. With lots of components and updating one having all the others rerender, you will face perfomance challenges. The system should be in a way that only the updated component should be rerendered.
+The optimization can be achieved using the React.Memo - This is a HOC that will prevent a functional component from being rerendered if its props do not change.
+You can wrap your ccomponents around the react.memo prop to prevent the component from rerendering unless there is a change as React.memo(Title) or React.memo(Count)
+With React.memo, some of the component might not be rendered but not all of them. The intention is to only render the changed components.If the button being clicked, all the functions within the parent component are rerendered each time the parent component rerenders. We therefore need to consider reference equality. The function before the rerender is different from the function after the rerender and since the function is a prop, React.memo says the prop has changed and won't prevent the rerender.
+
+To prevent this feature, we use the:
+=> useCallback hook - This is a hook that will return a memorized version of the callback function that only changes if one of the dependencies has changed. It will cache the function and return it if no changes in dependencies. This prevents unnecessary renders. It is usefull when passing callbacks (functions as props) to optimized child components that rely on reference equality to prevent unnecessary renders.t
+The syntax is as:
+    const incrementAge = useCallback(() => {
+        setAge(age + 1)
+    }, [age])
+
+Why not use it every single time to ensure our code is optimized? With every line of code written, there is a cost attached in terms of memory allocation both for the created function and the array call.
+
+const dispense = candy => {
+  setCandies(allCandies => allCandies.filter(c => c !== candy))
+}
+
+and 
+
+const dispense = candy => {
+  setCandies(allCandies => allCandies.filter(c => c !== candy))
+}
+const dispenseCallback = React.useCallback(dispense, [])
+
+
+As much as the useCallback prevents rerenders, the first is executed faster than the second one because of the lines of code and the memory reserved for the empty array. hence a better performance for the first and not the second.
+
+Also, on the second render of the component, the original `dispense` function gets garbage collected (freeing up memory space) and then a new one is created. However, with the useCallback, the original `dispense` function won't get collected and a new one created , so you're worse-off from a memory perspective as well. Reason, it keep copies of old velues to return in the event we get the same dependencies as given previously.
+Checkout :
+  https://kentcdodds.com/blog/usememo-and-usecallback
+
+useMemo Hook:
+Can also be used to optimize perfomance.
+At times you may have a function that is not so good with perfomance. Could be fetching thousands of records, mapping the array, filtering and sorting an array. This makes the rerendering really slow. and this is likely to affect the other components that are rerendered.
+
+Consider:
+import React, { useState } from 'react'
+
+function Counter() {
+    const [counterOne, setCounterOne] = useState(0)
+    const [counterTwo, setCounterTwo] = useState(0)
+
+    const incrementOne = () => {
+        setCounterOne(counterOne + 1)
+    }
+
+    const incrementTwo = () => {
+        setCounterTwo(counterTwo + 1)
+    }
+
+    const isEven = () => {
+        //Try to make the response slower through a long array of entries:
+        let i = 0;
+        while(i < 20000000) i++
+        return counterOne % 2 === 0
+    }
+  return (
+    <div>
+      <div>
+        <button onClick={incrementOne}>Count One - {counterOne}</button>
+        <span>{isEven() ? ' Even ' : ' Odd '}</span>
+      </div>
+      <div><button onClick={incrementTwo}>Count two - {counterTwo}</button></div>
+    </div>
+  )
+}
+
+export default Counter
+
+
+We need to tell react not to check if counter one is even or odd when changing counter two values. This is where useMemo hook comes in to avoid expensive calculations on every render. This is done by first importing it then use it on the function to be recomputed.
+
+This is kinda similar to the useCallback hook. The difference is, useCallback caches the provides function instance itself whereas useMomo caches the result of the invoked function.
+
+useRef Hook:
+Used to manipulate the DOM. e.g., to focus on a field.
+
+
+
+
+
+
+
+
+
 
 
 
