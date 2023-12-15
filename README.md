@@ -725,7 +725,161 @@ Why would you need custom hooks?
 To share logic within components - Alternative to HOCs and Render props (Custom hooks are simpler alrternativr)
 
 Creating custom hooks:
-1. To update a document title:
+1. To update a document title: 
+   Usually such is achieved through the use of the useState and useEffect hook that triggers an update to the document.Title DOM element as:
+
+    import React, {useState, useEffect} from 'react'
+
+    //Keep track of count value and update the count value on the title
+
+    function DocTitleOne() {
+        const [count, setCount] = useState(0)
+
+        useEffect(() => {
+            document.title = `Count ${count}`
+        },[count])
+
+        return (
+            <div>
+                <button onClick={() => setCount(count + 1)}>Count - {count} </button>
+            </div>
+        )
+    }
+
+    export default DocTitleOne
+
+If you have multiple components that update the document title, there is need for a custom hook to do this.
+Create a hooks folder and create the useDocumentTitle function. It ust start the use keyword. Then within it add the reusable code from the DocTitleOne and DocTitleTwo Components.
+
+2. useCounter Custom Hook:
+   Will make it easier to reuse counter logic in case needed in multiple components.
+
+      import React, {useState} from 'react'
+
+      function CustomHookCounterOne() {
+          const [count, setCount] = useState(0)
+
+          const increment = () => {
+              setCount(prevCount => prevCount + 1)
+          }
+
+          const decrement = () => {
+              setCount(prevCount => prevCount - 1)
+          }
+          const reset = () => {
+              setCount(0)
+          }
+
+        return (
+          <div>
+            <h2>Count = {count}</h2>
+            <button onClick={increment}>Increment</button>
+            <button onClick={decrement}>Decrement</button>
+            <button onClick={reset}>Reset</button>
+          </div>
+        )
+      }
+
+      export default CustomHookCounterOne
+  
+  The code from within the counter code above should be moved to the useCounter Hook. To access the values the custom hook should return an array of values.
+
+3. Custom Hook for form inputs.
+   One can also use custom hooks to bind the value and the event handler of an input field. Consider the example below:
+
+    import React, {useState} from 'react'
+
+    function CustomHookUserForm() {
+        const [firstName, setFirstName]  = useState('')
+        const [lastName, setLastName]  = useState('')
+
+        const submitHandler = e => {
+            e.preventDefault()
+            alert(`Hello ${firstName} ${lastName}`)
+        }
+        return (
+            <div>
+                <form onSubmit={submitHandler}>
+                    <div>
+                        <lable>First Name</lable>
+                        <input value = {firstName} onChange={e => setFirstName(e.target.value)} type='text'/>
+                    </div>
+                    <div>
+                        <lable>Last Name</lable>
+                        <input value = {lastName} onChange={e => setLastName(e.target.value)} type='text'/>
+                    </div>
+                    <div>
+                        <button>Submit</button>
+                    </div>
+                </form>
+            </div>
+        )
+    }
+
+    export default CustomHookUserForm
+
+The code can be simplified using useinput custom hook that first set the value of the input field and also monitor and handles any change to that field.
+The hook return the value of the field in question, the bind which is used to monitor any change to the field, and the a reset function that can be used to clear the fields.
+ below are the two components:
+
+1. Form:
+  import React, {useState} from 'react'
+  import useInput from '../hooks/useInput'
+
+  function CustomHookUserForm() {
+      const [firstName, bindFirstName, resetFirstName] = useInput('')
+      const [lastName, bindLastName, resetLastName] = useInput('')
+
+      const submitHandler = e => {
+          e.preventDefault()
+          alert(`Hello ${firstName} ${lastName}`)
+          resetFirstName()
+          resetLastName()
+      }
+      return (
+          <div>
+              <form onSubmit={submitHandler}>
+                  <div>
+                      <label>First Name</label>
+                      <input {...bindFirstName} type='text'/>
+                  </div>
+                  <div>
+                      <label>Last Name</label>
+                      <input {...bindLastName} type='text'/>
+                  </div>
+                  <div>
+                      <button>Submit</button>
+                  </div>
+              </form>
+          </div>
+      )
+  }
+
+  export default CustomHookUserForm
+
+  2. Custom Hook:
+    import {useState} from 'react'
+
+    function useInput(initialValue) {
+      const [value, setValue] = useState(initialValue)
+
+      const reset = () => {
+        setValue(initialValue)
+      }
+
+      const bind = {
+        value,
+        onChange: e => {
+            setValue(e.target.value)
+        }
+      }
+
+      return [value, bind, reset]
+    }
+
+    export default useInput
+
+
 
 
 
