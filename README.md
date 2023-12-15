@@ -631,7 +631,105 @@ We need to tell react not to check if counter one is even or odd when changing c
 This is kinda similar to the useCallback hook. The difference is, useCallback caches the provides function instance itself whereas useMomo caches the result of the invoked function.
 
 useRef Hook:
-Used to manipulate the DOM. e.g., to focus on a field.
+Used to manipulate the DOM. e.g., to focus on an input text field. Below is how you can use the useRef to imperatively access DOM nodes in react components:
+import React, {useEffect, useRef} from 'react'
+
+function FocusInput() {
+
+    const inputRef = useRef(null)
+
+    useEffect(() => {
+        //focus the input element
+        inputRef.current.focus()
+    }, [])
+
+  return (
+    <div>
+      <input ref = {inputRef} type='text'/>
+    </div>
+  )
+}
+
+useRef hooks can also be used in other scenarios:
+E.g isf one want to create a timer that updates the DOM every second.
+This can be achieved using a class component with the componentDidMount and componentWillUnmount to increase the timer and clear the timer respectively.
+
+The same can be achieved on functional components using the useRef hook. 
+
+import React, {useEffect, useState} from 'react'
+
+function HookTimer() {
+    const [timer, setTimer] = useState(0)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimer(prevTimer => prevTimer + 1)
+        }, 1000);
+
+        return () => {
+            clearInterval(interval)
+        };
+    }, [])
+
+    return (
+        <div>
+            Hook Timer - {timer}
+            <button onClick={()=>clearInterval(interval)}>Clear Hook Timer</button>
+        </div>
+    )
+}
+
+export default HookTimer
+
+If the class component is implemented as a functional component, the interval variable is only accessibnle within the useEffect hook. Trying to access it from an event handler, it automatically throws an interval is not defined error. This is where useRef comes to the rescue.
+
+useRef can be used to store an ummuttable value. The value will persist within the renders and will not cause additional renders when the value changes. Hence the code should be in the format:
+
+import React, {useEffect, useState, useRef} from 'react'
+
+function HookTimer() {
+    const [timer, setTimer] = useState(0)
+    const intervalRef = useRef()
+
+    useEffect(() => {
+        intervalRef.current = setInterval(() => {
+            setTimer(prevTimer => prevTimer + 1)
+        }, 1000);
+
+        return () => {
+            clearInterval(intervalRef.current)
+        };
+    }, [])
+
+    return (
+        <div>
+            Hook Timer - {timer}
+            <button onClick={()=>clearInterval(intervalRef.current)}>Clear Hook Timer</button>
+        </div>
+    )
+}
+
+export default HookTimer
+
+Other hooks include:
+1. useImperativeHandle
+2. useLayoutEffect
+3. useDebbugValue
+
+This are rarely used but can research further on them.
+
+Custom Hooks:
+The hooks covered so far are functions created within the React library. However it is also encouraged to build your own hooks by extracting component logic into reusable functions. Possible to create own custom hooks. A javascript function whose name starts with use.
+
+Why would you need custom hooks?
+To share logic within components - Alternative to HOCs and Render props (Custom hooks are simpler alrternativr)
+
+Creating custom hooks:
+1. To update a document title:
+
+
+
+
 
 
 
